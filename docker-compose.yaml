@@ -1,0 +1,42 @@
+services:
+  languagetool:
+    image: meyay/languagetool:latest
+    container_name: languagetool
+    restart: unless-stopped
+    ports:
+      # В версии 6.6+ порт по умолчанию внутри контейнера — 8081.
+      # Пробрасываем его на тот же порт хоста.
+      - "8081:8081"
+    environment:
+      # Минимальный и максимальный размер Java heap.
+      # Для русского языка и одного пользователя 1g-2g обычно достаточно.
+      JAVA_XMS: 256m
+      JAVA_XMX: 2g
+      # Раскомментируйте, если хотите автоматически скачать n-граммы для языков.
+      # Это может улучшить качество проверки, но увеличит время первого запуска.
+      # download_ngrams_for_langs: en,de,ru
+    volumes:
+      # Опционально: для сохранения n-грамм между перезапусками контейнера.
+      - ./ngrams:/ngrams
+      # Обязательный volume для временных файлов (tmpfs).
+    tmpfs:
+      - /tmp:exec
+    # Настройки безопасности (рекомендованы автором образа).
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+      - CAP_SETGID
+    security_opt:
+      - no-new-privileges
+    # использует сеть vllm_network для связи с fastapi
+    networks:
+      vllm_network:
+    
+networks:
+  vllm_network:
+    name: vllm_network
+    driver: bridge
+    external: true
