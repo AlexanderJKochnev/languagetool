@@ -16,8 +16,9 @@ services:
       # Это может улучшить качество проверки, но увеличит время первого запуска.
       # download_ngrams_for_langs: en,de,ru
     volumes:
+      - ${BIND_VOLUMES}/langtool/fasttext:/fasttext
       # Опционально: для сохранения n-грамм между перезапусками контейнера.
-      - ./ngrams:/ngrams
+      - ${BIND_VOLUMES}/langtool/ngrams:/ngrams
       # Обязательный volume для временных файлов (tmpfs).
     tmpfs:
       - /tmp:exec
@@ -32,9 +33,6 @@ services:
     security_opt:
       - no-new-privileges
     # использует сеть vllm_network для связи с fastapi
-    volumes:
-      # - ./fasttext:/fasttext
-      - ${BIND_VOLUMES}/langtool/fasttext:/fasttext
     networks:
       vllm_network:
     
