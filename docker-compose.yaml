@@ -32,6 +32,9 @@ services:
     security_opt:
       - no-new-privileges
     # использует сеть vllm_network для связи с fastapi
+    volumes:
+      # - ./fasttext:/fasttext
+      - ${BIND_VOLUMES}/langtool/fasttext:/fasttext
     networks:
       vllm_network:
     
